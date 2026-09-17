@@ -107,10 +107,22 @@ have surfaced — see [VERIFY.md](VERIFY.md#what-the-live-run-actually-found).
 
 ## Install
 
+Published on npm, so no build step and no build-approval prompt:
+
 ```sh
-# from the profile directory of a web-based dsh profile
+dsh plugin --profile web add dsh-belief-merge
+```
+
+From a checkout instead:
+
+```sh
 dsh plugin --profile web add /absolute/path/to/belief-merge
 ```
+
+> **`dsh-belief-merge@0.0.1` is not installable as a profile layer** — it
+> predates the `dsh.bundle` manifest. If you installed it, `^0.0.1` will not
+> upgrade on its own (caret on a `0.0.x` version does not cross into `0.1.0`);
+> ask for `dsh-belief-merge@0.1.0` explicitly.
 
 Then enable it in the profile's `cordis.patch.yml`:
 

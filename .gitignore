@@ -32,3 +32,4 @@ dist/
 # Machine-specific workaround: github.com:443 is unreachable here, so pushes
 # go through the REST API. Not part of the project.
 sync-to-github.py
+awesome-dsh-plugin-submission.yml

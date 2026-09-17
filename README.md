@@ -10,6 +10,12 @@ npm run demo         # end-to-end, offline
 npm run bench:tight  # the budgeted comparison
 ```
 
+Install it into DeepSeek Harness:
+
+```sh
+dsh plugin --profile web add dsh-belief-merge
+```
+
 ---
 
 ## The problem, in two sentences
