@@ -1,17 +1,20 @@
 {
   "name": "dsh-belief-merge",
-  "version": "0.0.1",
+  "version": "0.1.0",
   "description": "Provenance-retaining cross-session context merge for DeepSeek Harness",
   "type": "module",
   "main": "lib/index.js",
   "exports": {
     ".": "./lib/index.js",
-    "./core": "./lib/core/index.js"
+    "./cordis.patch.yml": "./cordis.patch.yml",
+    "./core": "./lib/core/index.js",
+    "./package.json": "./package.json"
   },
   "files": [
     "lib/**/*.js",
     "bench/**/*.js",
     "bench/README.md",
+    "cordis.patch.yml",
     "TECHNICAL-REPORT.md",
     "VERIFY.md"
   ],
@@ -53,5 +56,14 @@
   },
   "engines": {
     "node": ">=20"
+  },
+  "dsh": {
+    "bundle": {
+      "patch": "./cordis.patch.yml"
+    }
+  },
+  "devDependencies": {
+    "@deepseek-ai/dsh-llm": "0.1.5-rc.2",
+    "@deepseek-ai/schemastery": "3.18.2"
   }
 }

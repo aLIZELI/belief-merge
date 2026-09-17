@@ -1,0 +1,27 @@
+# dsh-belief-merge bundle patch.
+#
+# This is what makes the package a profile LAYER rather than a plain
+# dependency: `dsh plugin --profile <name> add dsh-belief-merge`, then naming
+# it in `dsh.profile.bundles`, mounts it.
+#
+# The default config is deliberately INERT. `sources` is empty, so the plugin
+# loads and registers nothing. Merging other sessions is opt-in: point
+# `sources` at the session ids you want, in your own patch layer, by targeting
+# the row id below.
+#
+#   - id: belief-merge
+#     config:
+#       sources:
+#         - session-<uuid>
+#       budgetTokens: 700
+#
+# Row order carries no load semantics; activation is service-availability
+# driven.
+
+- insert:
+    - id: belief-merge
+      name: dsh-belief-merge
+      config:
+        # Empty means: mounted, but injects nothing. Enabling this plugin is an
+        # explicit choice because it reads other conversations.
+        sources: []
