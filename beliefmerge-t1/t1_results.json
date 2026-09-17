@@ -1,0 +1,561 @@
+{
+  "confluence": [
+    {
+      "space": "A",
+      "score": "egalitarian",
+      "representation": "JOIN",
+      "well_formed": false,
+      "failures": 0,
+      "total": 19683,
+      "rate": 0.0
+    },
+    {
+      "space": "A",
+      "score": "egalitarian",
+      "representation": "COUNT",
+      "well_formed": false,
+      "failures": 7740,
+      "total": 19683,
+      "rate": 0.39323273891175126
+    },
+    {
+      "space": "A",
+      "score": "egalitarian",
+      "representation": "MAX",
+      "well_formed": false,
+      "failures": 8034,
+      "total": 19683,
+      "rate": 0.40816948635878675
+    },
+    {
+      "space": "A",
+      "score": "elitist",
+      "representation": "JOIN",
+      "well_formed": false,
+      "failures": 0,
+      "total": 19683,
+      "rate": 0.0
+    },
+    {
+      "space": "A",
+      "score": "elitist",
+      "representation": "COUNT",
+      "well_formed": false,
+      "failures": 7794,
+      "total": 19683,
+      "rate": 0.395976223136717
+    },
+    {
+      "space": "A",
+      "score": "elitist",
+      "representation": "MAX",
+      "well_formed": false,
+      "failures": 7620,
+      "total": 19683,
+      "rate": 0.38713610730071635
+    },
+    {
+      "space": "A",
+      "score": "egalitarian",
+      "representation": "JOIN",
+      "well_formed": true,
+      "failures": 0,
+      "total": 343,
+      "rate": 0.0
+    },
+    {
+      "space": "A",
+      "score": "egalitarian",
+      "representation": "COUNT",
+      "well_formed": true,
+      "failures": 54,
+      "total": 343,
+      "rate": 0.15743440233236153
+    },
+    {
+      "space": "A",
+      "score": "egalitarian",
+      "representation": "MAX",
+      "well_formed": true,
+      "failures": 90,
+      "total": 343,
+      "rate": 0.26239067055393583
+    },
+    {
+      "space": "A",
+      "score": "elitist",
+      "representation": "JOIN",
+      "well_formed": true,
+      "failures": 0,
+      "total": 343,
+      "rate": 0.0
+    },
+    {
+      "space": "A",
+      "score": "elitist",
+      "representation": "COUNT",
+      "well_formed": true,
+      "failures": 36,
+      "total": 343,
+      "rate": 0.10495626822157435
+    },
+    {
+      "space": "A",
+      "score": "elitist",
+      "representation": "MAX",
+      "well_formed": true,
+      "failures": 72,
+      "total": 343,
+      "rate": 0.2099125364431487
+    },
+    {
+      "space": "B",
+      "score": "egalitarian",
+      "representation": "JOIN",
+      "well_formed": false,
+      "failures": 0,
+      "total": 15625,
+      "rate": 0.0
+    },
+    {
+      "space": "B",
+      "score": "egalitarian",
+      "representation": "COUNT",
+      "well_formed": false,
+      "failures": 4488,
+      "total": 15625,
+      "rate": 0.287232
+    },
+    {
+      "space": "B",
+      "score": "egalitarian",
+      "representation": "MAX",
+      "well_formed": false,
+      "failures": 3594,
+      "total": 15625,
+      "rate": 0.230016
+    },
+    {
+      "space": "B",
+      "score": "elitist",
+      "representation": "JOIN",
+      "well_formed": false,
+      "failures": 0,
+      "total": 15625,
+      "rate": 0.0
+    },
+    {
+      "space": "B",
+      "score": "elitist",
+      "representation": "COUNT",
+      "well_formed": false,
+      "failures": 3276,
+      "total": 15625,
+      "rate": 0.209664
+    },
+    {
+      "space": "B",
+      "score": "elitist",
+      "representation": "MAX",
+      "well_formed": false,
+      "failures": 3240,
+      "total": 15625,
+      "rate": 0.20736
+    },
+    {
+      "space": "B",
+      "score": "egalitarian",
+      "representation": "JOIN",
+      "well_formed": true,
+      "failures": 0,
+      "total": 729,
+      "rate": 0.0
+    },
+    {
+      "space": "B",
+      "score": "egalitarian",
+      "representation": "COUNT",
+      "well_formed": true,
+      "failures": 90,
+      "total": 729,
+      "rate": 0.12345679012345678
+    },
+    {
+      "space": "B",
+      "score": "egalitarian",
+      "representation": "MAX",
+      "well_formed": true,
+      "failures": 114,
+      "total": 729,
+      "rate": 0.15637860082304528
+    },
+    {
+      "space": "B",
+      "score": "elitist",
+      "representation": "JOIN",
+      "well_formed": true,
+      "failures": 0,
+      "total": 729,
+      "rate": 0.0
+    },
+    {
+      "space": "B",
+      "score": "elitist",
+      "representation": "COUNT",
+      "well_formed": true,
+      "failures": 72,
+      "total": 729,
+      "rate": 0.09876543209876543
+    },
+    {
+      "space": "B",
+      "score": "elitist",
+      "representation": "MAX",
+      "well_formed": true,
+      "failures": 96,
+      "total": 729,
+      "rate": 0.13168724279835392
+    }
+  ],
+  "minimal_witness": [
+    {
+      "well_formed": false,
+      "score": "egalitarian",
+      "representation": "COUNT",
+      "size": 3,
+      "profile": [
+        "<empty>",
+        "{c@1(b1)}",
+        "{b@2(b2), c@1(b2)}"
+      ],
+      "n_ary": "disputed{b,c}",
+      "order": [
+        0,
+        2,
+        1
+      ],
+      "incremental": "b"
+    },
+    {
+      "well_formed": false,
+      "score": "egalitarian",
+      "representation": "MAX",
+      "size": 3,
+      "profile": [
+        "<empty>",
+        "{c@1(b1)}",
+        "{b@2(b2), c@1(b2)}"
+      ],
+      "n_ary": "disputed{b,c}",
+      "order": [
+        0,
+        1,
+        2
+      ],
+      "incremental": "b"
+    },
+    {
+      "well_formed": false,
+      "score": "elitist",
+      "representation": "COUNT",
+      "size": 3,
+      "profile": [
+        "<empty>",
+        "{c@2(b1)}",
+        "{b@2(b2), c@1(b2)}"
+      ],
+      "n_ary": "c",
+      "order": [
+        0,
+        2,
+        1
+      ],
+      "incremental": "disputed{b,c}"
+    },
+    {
+      "well_formed": false,
+      "score": "elitist",
+      "representation": "MAX",
+      "size": 3,
+      "profile": [
+        "<empty>",
+        "{c@2(b1)}",
+        "{b@2(b2), c@1(b2)}"
+      ],
+      "n_ary": "c",
+      "order": [
+        0,
+        2,
+        1
+      ],
+      "incremental": "disputed{b,c}"
+    },
+    {
+      "well_formed": true,
+      "score": "egalitarian",
+      "representation": "COUNT",
+      "size": 3,
+      "profile": [
+        "{a@1(b0)}",
+        "{a@1(b1)}",
+        "{b@2(b2)}"
+      ],
+      "n_ary": "disputed{a,b}",
+      "order": [
+        0,
+        2,
+        1
+      ],
+      "incremental": "b"
+    },
+    {
+      "well_formed": true,
+      "score": "egalitarian",
+      "representation": "MAX",
+      "size": 3,
+      "profile": [
+        "{a@1(b0)}",
+        "{a@1(b1)}",
+        "{b@1(b2)}"
+      ],
+      "n_ary": "a",
+      "order": [
+        0,
+        1,
+        2
+      ],
+      "incremental": "disputed{a,b}"
+    },
+    {
+      "well_formed": true,
+      "score": "elitist",
+      "representation": "COUNT",
+      "size": 3,
+      "profile": [
+        "{a@1(b0)}",
+        "{a@2(b1)}",
+        "{b@2(b2)}"
+      ],
+      "n_ary": "a",
+      "order": [
+        0,
+        2,
+        1
+      ],
+      "incremental": "disputed{a,b}"
+    },
+    {
+      "well_formed": true,
+      "score": "elitist",
+      "representation": "MAX",
+      "size": 3,
+      "profile": [
+        "{a@1(b0)}",
+        "{a@1(b1)}",
+        "{b@1(b2)}"
+      ],
+      "n_ary": "a",
+      "order": [
+        0,
+        1,
+        2
+      ],
+      "incremental": "disputed{a,b}"
+    }
+  ],
+  "idempotence": [
+    {
+      "score": "egalitarian",
+      "representation": "JOIN",
+      "decision_level": true,
+      "state_level": true
+    },
+    {
+      "score": "egalitarian",
+      "representation": "COUNT",
+      "decision_level": true,
+      "state_level": false
+    },
+    {
+      "score": "egalitarian",
+      "representation": "MAX",
+      "decision_level": true,
+      "state_level": false
+    },
+    {
+      "score": "elitist",
+      "representation": "JOIN",
+      "decision_level": true,
+      "state_level": true
+    },
+    {
+      "score": "elitist",
+      "representation": "COUNT",
+      "decision_level": true,
+      "state_level": false
+    },
+    {
+      "score": "elitist",
+      "representation": "MAX",
+      "decision_level": true,
+      "state_level": false
+    }
+  ],
+  "compounded": [
+    {
+      "cost": 3,
+      "branches": [
+        [
+          [
+            0,
+            "assert",
+            1
+          ]
+        ],
+        [
+          [
+            0,
+            "assert",
+            1
+          ]
+        ],
+        [
+          [
+            0,
+            "refute",
+            1
+          ]
+        ]
+      ],
+      "n_ary_IN": [
+        0
+      ],
+      "incremental_IN": []
+    },
+    {
+      "cost": 3,
+      "branches": [
+        [
+          [
+            0,
+            "assert",
+            1
+          ]
+        ],
+        [
+          [
+            0,
+            "assert",
+            2
+          ]
+        ],
+        [
+          [
+            0,
+            "refute",
+            2
+          ]
+        ]
+      ],
+      "n_ary_IN": [
+        0
+      ],
+      "incremental_IN": []
+    }
+  ],
+  "compounded_chain3": [
+    {
+      "cost": 6,
+      "branches": [
+        [
+          [
+            0,
+            "assert",
+            2
+          ],
+          [
+            1,
+            "assert",
+            2
+          ]
+        ],
+        [
+          [
+            1,
+            "refute",
+            1
+          ],
+          [
+            2,
+            "refute",
+            1
+          ]
+        ],
+        [
+          [
+            0,
+            "refute",
+            1
+          ],
+          [
+            1,
+            "refute",
+            1
+          ]
+        ]
+      ],
+      "n_ary_IN": [
+        0
+      ],
+      "incremental_IN": [
+        0,
+        1
+      ]
+    },
+    {
+      "cost": 6,
+      "branches": [
+        [
+          [
+            0,
+            "assert",
+            2
+          ],
+          [
+            1,
+            "refute",
+            2
+          ],
+          [
+            2,
+            "refute",
+            2
+          ]
+        ],
+        [
+          [
+            0,
+            "refute",
+            2
+          ],
+          [
+            1,
+            "refute",
+            1
+          ]
+        ],
+        [
+          [
+            0,
+            "assert",
+            2
+          ]
+        ]
+      ],
+      "n_ary_IN": [
+        0
+      ],
+      "incremental_IN": []
+    }
+  ]
+}

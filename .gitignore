@@ -1,0 +1,30 @@
+# ── Node ────────────────────────────────────────────────────────────
+node_modules/
+
+# ── Python ──────────────────────────────────────────────────────────
+__pycache__/
+*.py[cod]
+.venv*/
+*.egg-info/
+
+# ── Editors / OS ────────────────────────────────────────────────────
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+*.swp
+
+# ── Local-only, must never be published ─────────────────────────────
+# Unidentified 51-byte marker file in the workspace root; not part of the
+# project. Excluded until someone can say what created it.
+:memory:.ses
+
+# Personal interview notes. Kept locally on purpose: the technical report and
+# the README already carry the substance, and interview prep is not a deliverable.
+面试要点.md
+
+# ── Build / tool output ─────────────────────────────────────────────
+*.log
+npm-debug.log*
+coverage/
+dist/

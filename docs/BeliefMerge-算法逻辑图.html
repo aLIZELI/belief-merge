@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<title>BeliefMerge · 跨会话信念融合引擎 · 算法逻辑图</title>
+<style>
+  :root { --ink:#1a1a1a; --muted:#666; --line:#e0e0e0; --accent:#2b5cff; }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; padding: 40px 24px 80px;
+    font-family: -apple-system, "PingFang SC", "Microsoft YaHei", "Segoe UI", sans-serif;
+    color: var(--ink); background: #fbfbfd; line-height: 1.6;
+  }
+  .wrap { max-width: 1400px; margin: 0 auto; }
+  h1 { font-size: 26px; margin: 0 0 6px; letter-spacing: -0.01em; }
+  .sub { color: var(--muted); font-size: 14px; margin-bottom: 8px; }
+  .formula {
+    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    background: #f2f4f8; border-left: 3px solid var(--accent);
+    padding: 10px 14px; border-radius: 6px; font-size: 13px;
+    margin: 16px 0 32px; color: #333; overflow-x: auto;
+  }
+  section { background: #fff; border: 1px solid var(--line); border-radius: 12px;
+            padding: 20px; margin-bottom: 28px; overflow-x: auto; }
+  h2 { font-size: 17px; margin: 0 0 4px; }
+  .note { color: var(--muted); font-size: 13px; margin: 0 0 16px; }
+  .mermaid { text-align: center; }
+  .fallback { display: none; }
+  .legend { display: flex; flex-wrap: wrap; gap: 18px; font-size: 13px;
+            color: var(--muted); margin-top: 8px; padding-top: 14px;
+            border-top: 1px dashed var(--line); }
+  .legend b { color: var(--ink); font-weight: 600; }
+  #err { display: none; background: #fff4f4; border: 1px solid #ffd0d0;
+         color: #a00; padding: 14px; border-radius: 8px; font-size: 13px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <h1>BeliefMerge — 跨会话信念融合引擎</h1>
+  <div class="sub">Provenance-Typed, Trust-Latticed Belief Merging for Cross-Session Agent Context Fusion</div>
+
+  <div class="formula">
+    max<sub>S ⊆ V</sub> &nbsp;U(S; q) &nbsp;&nbsp;s.t.&nbsp;&nbsp; Σ<sub>v∈S</sub> tok(v) ≤ T &nbsp;&nbsp;∧&nbsp;&nbsp; S 满足一致性约束
+  </div>
+
+  <div id="err">
+    ⚠️ 图表未能渲染：本文件需要联网加载 Mermaid（cdn.jsdelivr.net）。<br>
+    离线时请查看同目录 Markdown 文档中的 ASCII 版架构图。
+  </div>
+
+  <section>
+    <h2>主流水线 · 8 个阶段</h2>
+    <p class="note">从事件日志到自改进闭环。虚線为反馈回路。</p>
+    <div class="mermaid">
+flowchart TD
+    subgraph L0["Stage 0 · 分支定位与原像"]
+        B1["会话分支 B₁<br/>事件日志"]
+        B2["会话分支 B₂<br/>事件日志"]
+        BASE["merge base α<br/>fork 血缘 · 可为空"]
+        B1 --> BASE
+        B2 --> BASE
+    end
+
+    subgraph L1["Stage 1 · 声明图构建 Graphify"]
+        EXT["类型化抽取器<br/>Fact · Decision · Constraint<br/>Refuted · Artifact · Goal · OpenQ"]
+        BASE --> EXT
+        B1 --> EXT
+        B2 --> EXT
+        EXT --> G["声明图 G = (V, E, π, ε, τ)<br/>π 溯源 · ε 证据等级 · τ 信任标签"]
+    end
+
+    subgraph L2["Stage 2 · 语义对齐 Align"]
+        CAS{"级联判定器"}
+        G --> CAS
+        CAS -->|"哈希 / 工具ID / URI"| EQ["等价类 V/~"]
+        CAS -->|"双向 NLI 蕴含"| EQ
+        CAS -->|"嵌入近邻"| EQ
+        CAS -->|"NLI 矛盾"| CF["冲突集 ⊥"]
+    end
+
+    subgraph L3["Stage 3 · 信念调和 Reconcile"]
+        GATE{"证据等级可判定?"}
+        CF --> GATE
+        GATE -->|"是"| PRI["优先基修正<br/>Prioritized Base Revision"]
+        GATE -->|"否 · 势均力敌"| ADJ["LLM 裁决器<br/>必须输出 premise ids"]
+        PRI --> JTMS["JTMS 真值维护<br/>沿 derived-from 传播撤回"]
+        ADJ --> JTMS
+    end
+
+    subgraph L4["Stage 4 · 验证与水密 Verify"]
+        NLI["NLI 一致性检查"]
+        JTMS --> NLI
+        NLI -->|"通过"| PHI["融合信念集 Φ*"]
+        NLI -->|"残留矛盾"| Q["显式隔离为开放问题"]
+        PHI --> TAINT["信任格传播<br/>多支撑取 join · 单支撑取 meet"]
+    end
+
+    subgraph L5["Stage 5 · 预算打包 Pack"]
+        OPT["子模背包最大化<br/>max U(S) s.t. tok(S) ≤ T"]
+        TAINT --> OPT
+        OPT --> LAY["KV-cache 感知布局<br/>稳定前缀 ‖ 易变尾部"]
+    end
+
+    subgraph L6["Stage 6 · 注入 Inject"]
+        PJ["agent/pre-step<br/>user/message + merge/* 事件"]
+        LAY --> PJ
+    end
+
+    subgraph L7["Stage 7 · 归因闭环 Attribute"]
+        OBS["下游会话成败信号"]
+        SHAP["Shapley 归因 φ(v)"]
+        PJ --> OBS --> SHAP
+        SHAP -.->|"reward / 剪枝"| ADJ
+        SHAP -.->|"调参 λ, μ"| OPT
+    end
+
+    classDef newpoint fill:#eaf0ff,stroke:#2b5cff,stroke-width:2px,color:#123
+    classDef classic fill:#f6f6f6,stroke:#bbb,color:#333
+    class EXT,G,EQ,CF,PRI,ADJ,JTMS,NLI,PHI,Q,TAINT,OPT,LAY,SHAP newpoint
+    class B1,B2,BASE,PJ,OBS classic
+    </div>
+    <div class="legend">
+      <span><b>蓝框</b> = 含形式化保证的核心环节</span>
+      <span><b>灰框</b> = 工程/平台对接环节</span>
+      <span><b>虚线</b> = 自改进反馈回路</span>
+    </div>
+  </section>
+
+  <section>
+    <h2>子流程 · 信念调和状态机</h2>
+    <p class="note">只有两条路径能“消灭”一个声明：证据等级压制，或通过对称性检验的裁决。其余一律隔离而非删除。</p>
+    <div class="mermaid">
+stateDiagram-v2
+    [*] --> Detected: NLI 检测到矛盾 (v,w)
+    Detected --> RankCompare: 比较证据等级 ε
+    RankCompare --> ChooseStrong: ε(v) ≠ ε(w)
+    RankCompare --> SymTest: ε(v) = ε(w)
+    SymTest --> Adjudicate: 交换顺序结论一致
+    SymTest --> Quarantine: 交换顺序结论翻转
+    Adjudicate --> Verdict: 输出 premise ids ⊆ V
+    Verdict --> ChooseStrong: choose_a / choose_b
+    Verdict --> Conditional: 冲突源于假设不同
+    Verdict --> Union: 互补而非矛盾
+    ChooseStrong --> Propagate
+    Conditional --> Propagate
+    Union --> Propagate
+    Quarantine --> [*]: 记为显式开放问题
+    Propagate --> [*]: JTMS 沿 derived-from 传播
+    </div>
+  </section>
+
+  <section>
+    <h2>子流程 · 预算打包与信任传播</h2>
+    <div class="mermaid">
+flowchart LR
+    subgraph TRUST["信任格 (有界格)"]
+        TT["trusted"]
+        TU["user-stated"]
+        TV["tool-verified"]
+        TN["untrusted"]
+        TT --- TU
+        TT --- TV
+        TU --- TN
+        TV --- TN
+    end
+
+    subgraph PACK["预算打包"]
+        V2["声明图 G"]
+        UTIL["效用函数 U(S)<br/>个体效用 + 覆盖奖励(子模) − 冗余惩罚"]
+        GREEDY["枚举部分解 + 贪心<br/>近似比 1 − 1/e"]
+        LAYOUT["确定性序列化布局<br/>稳定层 → 半稳定 → 易变层"]
+        V2 --> UTIL --> GREEDY --> LAYOUT
+    end
+
+    TRUST -.->|"过滤: 低信任不进入稳定层"| PACK
+    </div>
+  </section>
+
+  <section>
+    <h2>两个可证命题（项目的理论核心）</h2>
+    <p class="note">没有定理，这套架构就只是“1998 信念合并 + 2007 溯源半环 + 2024 CacheBlend 套到对话上”。这两个命题是让项目从工程变成研究的关键。</p>
+    <div class="mermaid">
+flowchart TD
+    P1["<b>命题 P1 · 迭代合并稳定性</b><br/>设 Δ 为 Dalal 距离 + 证据等级加权的<br/>n 元合并算子。<br/>则 Δ 在『证据等级严格全序』的子类上结合；<br/>一旦出现等级相等需 LLM 裁决，结合律失效，<br/>必须回退 n 元直算。"]
+    P2["<b>命题 P2 · 溯源半环同态</b><br/>若 Δ 是溯源半环上的同态：<br/>α(Δ(v)) = ⨁ᵢ αᵢ(v)<br/>则合并自动满足幂等性 (I4) 与交换性 (I3)。"]
+    WHY["为什么关键<br/>· P1 回应 Darwiche–Pearl 1997：AGM 对迭代修订不充分<br/>· 树形分支拓扑必然导致迭代合并<br/>· 证伪同样是尖锐结论：『不满足结合律 → 必须 n 元直算』"]
+    P1 --> WHY
+    P2 --> WHY
+    WHY --> ASK["面试必答题<br/>『你的新定理是什么？』"]
+    </div>
+    <div class="legend">
+      <span><b>P1</b> = 定理或反例，两者都有价值</span>
+      <span><b>P2</b> = 把“防信任洗白”从工程规则升级为代数定理</span>
+      <span><b>最低要求</b> = 至少拿下 P1 或 P2 之一</span>
+    </div>
+  </section>
+
+  <section>
+    <h2>核心不变量</h2>
+    <div class="mermaid">
+flowchart TD
+    I2["I2 无信任放大<br/>trust(v∧w) ⊑ trust(v) ⊓ trust(w)"]
+    I3["I3 对称性<br/>交换分支顺序 → 结果不变 (IC2)"]
+    I4["I4 幂等性<br/>Δ(E ∪ {Δ(E)}) = Δ(E)"]
+    I5["I5 确定性序列化<br/>同输入 → 逐字节同输出 (KV cache 前提)"]
+    I6["I6 无孤儿<br/>不存在 IN 节点依赖 OUT 节点"]
+    I1["I1 溯源完备<br/>每个声明可映射回 (sessionId, seq, span)"]
+    I7["I7 预算满足<br/>Σtok(v) ≤ T (硬约束)"]
+    I8["I8 残留矛盾显式化<br/>禁止静默矛盾"]
+    I3 --> I4 --> I5
+    I1 --> I6
+    I2 --> I8
+    I7 --> I5
+    </div>
+  </section>
+
+  <div class="sub" style="text-align:center;margin-top:32px">
+    DeepSeek Harness 扩展点：<code>agent/pre-step</code> · <code>surfaceOp: replace</code> ·
+    <code>SessionProjectionMap</code> · <code>SessionEventMap</code> 声明合并 · <code>CompactionEngine</code>
+  </div>
+</div>
+
+<script>
+  window.addEventListener('error', function () {
+    document.getElementById('err').style.display = 'block';
+  }, true);
+  setTimeout(function () {
+    if (!window.__mermaidLoaded) document.getElementById('err').style.display = 'block';
+  }, 4000);
+</script>
+<script type="module">
+  try {
+    const mermaid = (await import('https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs')).default;
+    window.__mermaidLoaded = true;
+    document.getElementById('err').style.display = 'none';
+    mermaid.initialize({
+      startOnLoad: false,
+      theme: 'base',
+      themeVariables: {
+        fontFamily: '-apple-system, "PingFang SC", "Microsoft YaHei", sans-serif',
+        fontSize: '14px',
+        primaryColor: '#ffffff',
+        primaryBorderColor: '#bbb',
+        lineColor: '#888'
+      },
+      flowchart: { curve: 'basis', nodeSpacing: 45, rankSpacing: 55, useMaxWidth: true },
+      state: { useMaxWidth: true }
+    });
+    await mermaid.run({ querySelector: '.mermaid' });
+  } catch (e) {
+    document.getElementById('err').style.display = 'block';
+  }
+</script>
+</body>
+</html>
