@@ -10,13 +10,17 @@
   },
   "files": [
     "lib/**/*.js",
-    "bench/**/*.js"
+    "bench/**/*.js",
+    "bench/README.md",
+    "TECHNICAL-REPORT.md",
+    "VERIFY.md"
   ],
   "scripts": {
     "test": "node --test",
     "demo": "node demo.js",
     "bench": "node bench/run.js",
-    "bench:tight": "node bench/run.js --seeds=5 --topics=10 --budget=400"
+    "bench:tight": "node bench/run.js --seeds=5 --topics=10 --budget=400",
+    "prepublishOnly": "node --test"
   },
   "keywords": [
     "dsh",
@@ -25,7 +29,10 @@
     "plugin",
     "context",
     "merge",
-    "belief-revision"
+    "belief-revision",
+    "provenance",
+    "submodular",
+    "benchmark"
   ],
   "license": "MIT",
   "peerDependencies": {
@@ -33,5 +40,18 @@
     "@deepseek-ai/dsh-agent": "^0.1.5-rc.2",
     "@deepseek-ai/dsh-llm": "^0.1.5-rc.2",
     "@deepseek-ai/schemastery": "^3.18.2"
+  },
+  "author": "aLIZELI",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/aLIZELI/belief-merge.git",
+    "directory": "belief-merge"
+  },
+  "homepage": "https://github.com/aLIZELI/belief-merge#readme",
+  "bugs": {
+    "url": "https://github.com/aLIZELI/belief-merge/issues"
+  },
+  "engines": {
+    "node": ">=20"
   }
 }
