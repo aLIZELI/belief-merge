@@ -84,6 +84,7 @@ of.
 | stage | what it does | module |
 |---|---|---|
 | 0 | locate branches; `fork` lineage gives a merge base where one exists | `lib/index.js` |
+| 0b | redact credentials at the surface, before extraction and before any prompt | `lib/core/redact.js` |
 | 1 | joint LLM extraction into typed, addressable slots | `lib/core/align.js` |
 | 2 | alignment is **joint**, not per-branch — the model sees all branches at once | `lib/core/align.js` |
 | 3a | evidence-weighted merge; ties become `DISPUTED`, never guessed | `lib/core/merge.js`, `slot.js` |
@@ -398,6 +399,7 @@ not about the paths you did not.**
 | 10 | benchmark | Concatenation was not respecting the budget, so at tight budgets it "won" by spending tokens nobody offered it |
 | 11 | live run | M4 was implemented, unit-tested, and **completely inert**: the model emitted zero `derivedFrom` edges. A worked example in the prompt produced edges immediately |
 | 12 | live run | The session id format differs by workspace (`session-<uuid>` vs `<uuid>`); the wrong form silently reads nothing |
+| 13 | live run | Merging two real sessions produced a claim whose value was a **live API key**. A context-merge plugin is a credential-distribution mechanism, and the alignment stage had already sent the key to a model API. Redaction now runs at the surface, before either extraction path and before any prompt is built |
 
 Two more worth separating out, because they are about honesty rather than code:
 
@@ -441,7 +443,7 @@ never once executed against real input. "It is tested" is not "it runs".
 ## 11. Reproducing everything
 
 ```sh
-npm test            # 182 tests, no dependencies, no network
+npm test            # 242 tests, no dependencies, no network
 npm run demo        # end-to-end, offline, seven worked examples
 npm run bench       # MergeBench
 npm run bench:tight # the budgeted comparison

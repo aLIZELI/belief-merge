@@ -20,7 +20,7 @@ The model then quoted the injected block back verbatim:
 - `papers.alignscore.arxiv_id` = **2305.16739**
 ```
 
-The live run found **four bugs** that unit testing could not have surfaced.
+The first live run found **four bugs** that unit testing could not have surfaced.
 
 ---
 

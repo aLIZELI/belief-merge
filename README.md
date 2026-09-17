@@ -5,15 +5,22 @@
 A [DeepSeek Harness](https://github.com/deepseek-ai/deepseek-harness) plugin, a confluence theorem with a counterexample, and a benchmark that was wrong twice before it was useful.
 
 ```sh
+dsh plugin --profile web add dsh-belief-merge
+```
+
+Then just ask: *"merge my two bilibili conversations into this one"* — or drive it
+by hand with `/merge` to list candidates, pick them, and check what is in effect.
+No config file to edit, no restart; it applies on the next turn.
+
+Full usage, configuration and limitations: **[belief-merge/README.md](belief-merge/README.md)**.
+
+Working on the code instead:
+
+```sh
+cd belief-merge
 npm test             # 242 tests, no dependencies, no network, no API key
 npm run demo         # end-to-end, offline
 npm run bench:tight  # the budgeted comparison
-```
-
-Install it into DeepSeek Harness:
-
-```sh
-dsh plugin --profile web add dsh-belief-merge
 ```
 
 ---
@@ -104,8 +111,8 @@ block, the model reported:
 | | |
 |---|---|
 | **[TECHNICAL-REPORT.md](belief-merge/TECHNICAL-REPORT.md)** | the full writeup — design, the confluence result, the benchmark, limitations |
-| **[belief-merge/](belief-merge/)** | the plugin: 9 core modules, 182 tests, an offline demo |
-| **[belief-merge/VERIFY.md](belief-merge/VERIFY.md)** | the live-run record — **12 bugs found by running it**, and a failure taxonomy |
+| **[belief-merge/](belief-merge/)** | the plugin: 14 core modules, 242 tests, an offline demo |
+| **[belief-merge/VERIFY.md](belief-merge/VERIFY.md)** | the live-run record — **13 bugs found by running it**, and a failure taxonomy |
 | **[belief-merge/bench/](belief-merge/bench/)** | MergeBench — generator, scored arms, results |
 | **[beliefmerge-t1/](beliefmerge-t1/)** | the confluence experiment — exhaustive enumeration, minimal counterexamples |
 | **[docs/](docs/)** | everything that is not code: |
@@ -113,7 +120,6 @@ block, the model reported:
 | ↳ [conversation-branch-merge-litreview.md](docs/conversation-branch-merge-litreview.md) | the literature review, ~60 references checked against Crossref/OpenAlex/arXiv |
 | ↳ [BeliefMerge-算法逻辑图.html](docs/BeliefMerge-算法逻辑图.html) | the architecture diagram, openable in a browser |
 | ↳ [refcheck/](docs/refcheck/) | the scripts used to verify those references |
-| **[面试要点.md](面试要点.md)** | interview preparation notes (Chinese), not part of the portfolio |
 
 ---
 
@@ -128,7 +134,9 @@ mechanism had **25 passing tests and had never once executed** against real
 input, because the model emitted zero edges until the prompt contained a worked
 example.
 
-Twelve entries are logged in [VERIFY.md](belief-merge/VERIFY.md), including one
+Thirteen are logged in
+[TECHNICAL-REPORT.md §9](belief-merge/TECHNICAL-REPORT.md#9-engineering-log--what-running-it-found),
+and narrated round by round in [VERIFY.md](belief-merge/VERIFY.md), including one
 demo whose narration was **false** until the budget was tightened enough for its
 claim to be true.
 
@@ -140,7 +148,7 @@ claim to be true.
 ## Reproducing everything
 
 ```sh
-cd belief-merge && npm test          # 182 tests, no network, no API key
+cd belief-merge && npm test          # 242 tests, no network, no API key
 cd belief-merge && npm run demo      # seven worked examples, offline
 cd belief-merge && npm run bench     # MergeBench
 cd beliefmerge-t1 && python3 run_t1.py  # the confluence experiment, ~14s
