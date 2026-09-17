@@ -110,13 +110,15 @@ export function buildAlignmentPrompt(surfaces, opts = {}) {
     maxSlots = 40,
   } = opts;
   const parts = [];
+  let redacted = 0;
   for (const surface of surfaces) {
-    const { text, truncated } = flattenSurface(surface.messages, {
+    const out = flattenSurface(surface.messages, {
       includeReasoning,
       includeInjected,
       maxChars: maxCharsPerBranch,
     });
-    parts.push(`### branch id: ${surface.id}${truncated ? ' (truncated)' : ''}\n${text}`);
+    redacted += out.redacted ?? 0;
+    parts.push(`### branch id: ${surface.id}${out.truncated ? ' (truncated)' : ''}\n${out.text}`);
   }
   const prompt = [
     `Merge the following ${surfaces.length} branches into one aligned claim set.`,
@@ -125,7 +127,7 @@ export function buildAlignmentPrompt(surfaces, opts = {}) {
     '',
     ...parts,
   ].join('\n');
-  return { system: SYSTEM_PROMPT, prompt };
+  return { system: SYSTEM_PROMPT, prompt, redacted };
 }
 
 /** Pull the first JSON object out of a model response. */
@@ -256,7 +258,7 @@ export async function alignSurfaces(surfaces, opts) {
     throw new Error('alignSurfaces requires an llm with a complete({system, prompt}) method');
   }
 
-  const { system, prompt } = buildAlignmentPrompt(surfaces, opts);
+  const { system, prompt, redacted } = buildAlignmentPrompt(surfaces, opts);
   const text = await llm.complete({ system, prompt, maxTokens, signal });
   const parsed = extractJsonObject(text);
   const normalized = normalizeAlignment(parsed, {
@@ -290,5 +292,5 @@ export async function alignSurfaces(surfaces, opts) {
     }
   }
 
-  return { branches, raw: normalized };
+  return { branches, raw: normalized, redacted };
 }

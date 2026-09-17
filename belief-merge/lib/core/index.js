@@ -34,6 +34,7 @@ export * from './adjudicate.js';
 export * from './trust.js';
 export * from './pack.js';
 export * from './derive.js';
+export * from './redact.js';
 
 /**
  * Merge a set of branches, each a list of already-extracted claims.
@@ -145,32 +146,32 @@ export async function mergeSurfacesAligned(surfaces, opts = {}) {
 
   let merged;
   let mode = 'heuristic';
+  let redacted = 0;
 
   if (hasLlm) {
     try {
-      const { branches } = await alignSurfaces(surfaces, { llm, ...rest });
-      merged = mergeBranches(branches, rest);
+      const aligned = await alignSurfaces(surfaces, { llm, ...rest });
+      redacted = aligned.redacted ?? 0;
+      merged = mergeBranches(aligned.branches, rest);
       mode = 'llm';
     } catch (error) {
       onWarn?.(`belief-merge: LLM alignment failed, using heuristic fallback: ${error?.message ?? error}`);
     }
   }
   if (!merged) {
-    merged = mergeBranches(
-      surfaces.map(({ id, messages, trust }) => ({
-        id,
-        trust: Number.isInteger(trust) ? trust : Trust.UNTRUSTED,
-        claims: extractClaims(messages, {
-          sourceId: id,
-          keyStrategy: rest.keyStrategy ?? 'exact',
-          includeReasoning: rest.includeReasoning ?? true,
-          includeInjected: rest.includeInjected ?? false,
-        }),
-      })),
-      rest,
-    );
+    const fallbackClaims = surfaces.map(({ id, messages, trust }) => ({
+      id,
+      trust: Number.isInteger(trust) ? trust : Trust.UNTRUSTED,
+      claims: extractClaims(messages, {
+        sourceId: id,
+        keyStrategy: rest.keyStrategy ?? 'exact',
+        includeReasoning: rest.includeReasoning ?? true,
+        includeInjected: rest.includeInjected ?? false,
+      }),
+    }));
+    redacted = fallbackClaims.reduce((n, b) => n + (b.claims.redacted ?? 0), 0);
+    merged = mergeBranches(fallbackClaims, rest);
   }
-
   // Stage 3c: settle what the evidence could not. Only runs on ties.
   let slots = merged.slots;
   let adjudication = { mode: 'none', conflicts: 0, resolved: 0, orderSensitive: 0 };
@@ -204,6 +205,7 @@ export async function mergeSurfacesAligned(surfaces, opts = {}) {
   return {
     slots,
     mode,
+    redacted,
     adjudication,
     derivation: {
       inCount: derivation.inCount,
@@ -212,6 +214,6 @@ export async function mergeSurfacesAligned(surfaces, opts = {}) {
       unknownPremises: derivation.unknownPremises,
       derivedCount: derivation.derivedCount,
     },
-    render: (o = {}) => renderMerged(slots, o),
+    render: (o = {}) => renderMerged(slots, { redacted, ...o }),
   };
 }

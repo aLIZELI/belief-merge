@@ -33,3 +33,4 @@ dist/
 # go through the REST API. Not part of the project.
 sync-to-github.py
 awesome-dsh-plugin-submission.yml
+dsh-sessions.sh

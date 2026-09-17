@@ -14,7 +14,7 @@ It differs from the official `dsh-session-reference` in exactly three ways:
 | contradictions | not considered | **detected and decided, or surfaced unresolved** |
 
 ```
-npm test        # 182 tests, no dependencies, no network
+npm test        # 213 tests, no dependencies, no network
 npm run demo    # offline end-to-end demonstration
 ```
 
@@ -68,7 +68,7 @@ and the model then quoted the injected block back verbatim:
 The live run found and fixed four bugs that no amount of unit testing would
 have surfaced — see [VERIFY.md](VERIFY.md#what-the-live-run-actually-found).
 
-- **The merge core** — 182 tests. Union is associative, commutative and
+- **The merge core** — 213 tests. Union is associative, commutative and
   idempotent; the P1 counterexample is a regression test; rendering is
   deterministic; disputes stay explicit; the token budget is enforced.
 - **The DSH adapter loads against the real packages and runs in a real process.**
@@ -384,6 +384,40 @@ strong alternative fully supports.
 Retracted slots are still rendered — marked, with the unmet premises named — but
 their packing utility is cut to 5%, so they appear only if there is room and
 never outrank a live claim.
+
+---
+
+## A merge must not distribute secrets either
+
+Found the hard way. Merging two real sessions produced a claim whose value was a
+**live API key** that happened to sit in one of them. A context-merge plugin is a
+credential-distribution mechanism: anything in a source conversation gets
+extracted and injected into every future turn. Worse, the alignment stage sends
+session text to a model API, so the key had already left the machine.
+
+Redaction now runs at the **surface**, before either extraction path sees the
+text and before any prompt is built:
+
+```
+source conversation  ->  redact  ->  claim graph  ->  rendered block
+                            \-->  alignment prompt  (never reaches the model)
+```
+
+**Deliberately conservative.** Only high-confidence shapes match: provider
+prefixes (`sk-`, `ghp_`, `AIza`, `AKIA`, `hf_`, `npm_`, JWTs, PEM blocks) and an
+explicit label (`api_key`, `token`, `密钥`, ...) followed by a value. A generic
+"long random-looking string" rule was rejected — it would silently rewrite
+commit hashes, arXiv ids and file paths, which in a system built on fidelity is
+a correctness bug, not a safety win.
+
+A credential with **no prefix and no label** is still caught if its shape is
+distinctive. The one that got through was `32-hex . 16-alnum`, which no prefixed
+rule matched.
+
+**The user is told.** The rendered block ends with
+`_**1 credential(s) withheld**_`, so the fact that a secret lives in a source
+session is surfaced rather than silently swallowed — which is the thing they
+actually need to know.
 
 ---
 

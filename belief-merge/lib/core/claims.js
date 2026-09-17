@@ -77,12 +77,14 @@ export function extractClaims(messages, opts = {}) {
   if (!sourceId) throw new Error('extractClaims requires opts.sourceId');
 
   const claims = [];
+  let redacted = 0;
   for (const message of messages ?? []) {
     const injected = isInjected(message);
     if (injected && !includeInjected) continue;
     const role = message?.role ?? 'assistant';
     for (const block of textBlocks(message)) {
       if (block.type === 'reasoning' && !includeReasoning) continue;
+      redacted += block.redacted ?? 0;
       const evidence = evidenceFor(role, block.type, injected);
       for (const sentence of splitSentences(block.text)) {
         const negated = NEGATION_EN.test(sentence) || NEGATION_ZH.test(sentence);
@@ -99,5 +101,8 @@ export function extractClaims(messages, opts = {}) {
       }
     }
   }
-  return claims.filter((c) => c.key.length > 0);
+  const kept = claims.filter((c) => c.key.length > 0);
+  // Non-enumerable so the existing array contract is unchanged.
+  Object.defineProperty(kept, 'redacted', { value: redacted, enumerable: false });
+  return kept;
 }

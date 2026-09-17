@@ -383,6 +383,18 @@ export function apply(ctx, config) {
           `perBranch=[${surfaces.map((s) => `${s.id}:${s.messages.length}msg`).join(' ')}]`,
       );
 
+      // Tell the user when credentials were withheld. Silently dropping them
+      // would hide the fact that a secret is sitting in a source session --
+      // which is exactly the thing they need to know.
+      if (merged.redacted > 0) {
+        warn(
+          `belief-merge: withheld ${merged.redacted} credential(s) found in the source ` +
+            `session(s). They were never extracted and never sent to a model. ` +
+            `Consider rotating any key that lives in a session you merge.`,
+        );
+        debug(`redacted=${merged.redacted}`);
+      }
+
       // Trust invariants are a SECURITY property, so a violation fails closed:
       // if the labels cannot be vouched for, the content does not go in.
       const trust = checkTrustInvariants(merged.slots);
@@ -400,6 +412,7 @@ export function apply(ctx, config) {
         budgetTokens: cfg.budgetTokens,
         algorithm: cfg.packAlgorithm,
         query,
+        redacted: merged.redacted,
       });
       debug(
         `rendered included=${rendered.included} dropped=${rendered.dropped} ` +

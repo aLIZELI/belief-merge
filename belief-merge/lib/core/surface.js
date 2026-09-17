@@ -15,15 +15,25 @@
  * included, are labelled `injected` so the evidence model can rank them last.
  */
 
-/** Iterate `{ type, text }` blocks of one message. */
+import { redactSecrets } from './redact.js';
+
+/**
+ * Iterate `{ type, text }` blocks of one message, REDACTED.
+ *
+ * This is the single choke point both extraction paths read through, and it
+ * sits upstream of prompt construction. Redacting here means a credential in
+ * a source conversation neither enters the claim graph nor leaves the machine
+ * in an alignment request. See ./redact.js for why that matters.
+ */
 export function* textBlocks(message) {
   const content = Array.isArray(message?.content) ? message.content : [];
   for (const block of content) {
     if (!block || typeof block !== 'object') continue;
     const type = block.type ?? 'text';
     if ((type === 'text' || type === 'reasoning') && typeof block.text === 'string') {
-      const text = block.text.trim();
-      if (text.length > 0) yield { type, text };
+      const { text: safe, found } = redactSecrets(block.text);
+      const text = safe.trim();
+      if (text.length > 0) yield { type, text, redacted: found.length };
     }
   }
 }
@@ -47,12 +57,13 @@ export function classifyBlock(role, blockType, message) {
  *
  * @param {Array} messages
  * @param {{includeReasoning?: boolean, includeInjected?: boolean, maxChars?: number}} opts
- * @returns {{text: string, truncated: boolean, skippedInjected: number}}
+ * @returns {{text: string, truncated: boolean, skippedInjected: number, redacted: number}}
  */
 export function flattenSurface(messages, opts = {}) {
   const { includeReasoning = true, includeInjected = false, maxChars = 6000 } = opts;
   const lines = [];
   let skippedInjected = 0;
+  let redacted = 0;
 
   for (const message of messages ?? []) {
     if (isInjected(message) && !includeInjected) {
@@ -63,6 +74,7 @@ export function flattenSurface(messages, opts = {}) {
     for (const block of textBlocks(message)) {
       if (block.type === 'reasoning' && !includeReasoning) continue;
       const label = classifyBlock(role, block.type, message);
+      redacted += block.redacted ?? 0;
       lines.push(`[${label}] ${block.text}`);
     }
   }
@@ -74,5 +86,5 @@ export function flattenSurface(messages, opts = {}) {
     text = `…(earlier content truncated)…\n${text.slice(text.length - maxChars)}`;
     truncated = true;
   }
-  return { text, truncated, skippedInjected };
+  return { text, truncated, skippedInjected, redacted };
 }

@@ -160,6 +160,7 @@ export function renderMerged(slots, opts = {}) {
     query,
     weights,
     algorithm = 'partial',
+    redacted = 0,
   } = opts;
 
   // Trust banner. Merged content comes from other sessions, so it is
@@ -229,6 +230,13 @@ export function renderMerged(slots, opts = {}) {
     lines.push(
       '',
       `_**${adjudicated} tie(s) settled by adjudication** — the underlying opinions are all retained above._`,
+    );
+  }
+
+  if (redacted > 0) {
+    lines.push(
+      '',
+      `_**${redacted} credential(s) withheld** — redacted before extraction, because a merge must not distribute secrets._`,
     );
   }
 
