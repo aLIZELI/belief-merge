@@ -14,7 +14,7 @@ It differs from the official `dsh-session-reference` in exactly three ways:
 | contradictions | not considered | **detected and decided, or surfaced unresolved** |
 
 ```
-npm test        # 213 tests, no dependencies, no network
+npm test        # 242 tests, no dependencies, no network
 npm run demo    # offline end-to-end demonstration
 ```
 
@@ -68,7 +68,7 @@ and the model then quoted the injected block back verbatim:
 The live run found and fixed four bugs that no amount of unit testing would
 have surfaced — see [VERIFY.md](VERIFY.md#what-the-live-run-actually-found).
 
-- **The merge core** — 213 tests. Union is associative, commutative and
+- **The merge core** — 242 tests. Union is associative, commutative and
   idempotent; the P1 counterexample is a regression test; rendering is
   deterministic; disputes stay explicit; the token budget is enforced.
 - **The DSH adapter loads against the real packages and runs in a real process.**
@@ -493,35 +493,65 @@ lives on the deterministic side, so it cannot be talked out of by a model.
 
 ---
 
-## Known UX gap: configuring it is unpleasant
+## Turning it on without editing YAML
 
-Recorded because it is the weakest part of the plugin, and because the honest
-version of the problem is more useful than a vague "TODO".
+The first version could only be configured by hand-editing
+`cordis.patch.yml` and restarting. Both frictions are now gone.
 
-**What it is like today.** A user must hand-edit
-`~/.dsh/profiles/<profile>/cordis.patch.yml` and restart the harness to change
-which sessions are merged.
+### Ask for it in conversation
 
-**Only half of that is necessary.**
+The `merge_sessions` tool lets the model do it:
 
-| step | necessary? | why |
+```
+you   merge my two bilibili conversations into this one
+model (calls merge_sessions: list, query "读取B站")
+      I found these two — shall I merge both?
+you   yes
+model (calls merge_sessions: set)
+      Merging is ON with 2 sources. Takes effect on the next turn.
+```
+
+### Or use the command
+
+```
+/merge                    list candidates
+/merge find 读取B站        list candidates matching a filter
+/merge f975843c 8c6e52e1  set (unique id prefixes are enough)
+/merge add <id>           add one
+/merge remove <id>        drop one
+/merge status             what is in effect, and from which layer
+/merge off                stop merging
+```
+
+A command result does not enter model history, which is why the command is the
+right surface for a control operation: it configures the conversation without
+becoming part of it.
+
+### Two layers, and which one wins
+
+| layer | set by | lives in |
 |---|---|---|
-| naming the sessions | **yes** | no default can know which conversations a user wants merged, and guessing would be worse than asking |
-| hand-editing YAML | **no** | the harness has a settings surface; a client half could collect the ids |
-| restarting | **no** | the profile defaults to `patchReload: startup`; `live` watches the patch files and applies changes without a restart |
+| **runtime** | the tool or `/merge` | `<dsh home>/storages/belief-merge/sources.json` |
+| **config** | `sources:` in `cordis.patch.yml` | the deployment default |
 
-**Options, cheapest first:**
+Runtime wins. `clear` (or `/merge off`) drops the runtime layer so the config
+default applies again, while `set` with an empty list is an explicit "merge
+nothing" — collapsing those two would make *reset* and *off* indistinguishable
+and users need both.
 
-| fix | removes | cost |
-|---|---|---|
-| set `patchReload: live` on the profile | the restart | one line, but it changes reload behaviour for **every** plugin in that profile |
-| a `dsh.client` settings panel | the YAML editing | a browser half and UI work; the largest change here |
-| a model-facing tool (`merge_sessions(ids)`) | both | the model, not the user, decides the ids — good for a one-off, poor as a standing configuration |
-| a prompt mention (`@merge <id>`) | both | parsing plus a discovery UI; closest to what `dsh-session-reference` already does |
+The state file is plain JSON, inspectable and hand-editable, and the plugin
+reads it **per turn**, so a change applies on the next turn rather than at the
+next restart. That is also why the pre-step listener is registered even when
+nothing is configured: a user with no sources is exactly the user who needs the
+tool to turn merging on.
 
-**The honest summary:** the *information* the user must supply is irreducible,
-but the *friction* around supplying it is not, and today's version charges the
-maximum. This is a UX debt, not a design constraint.
+### What is still missing
+
+The settings-panel card is the remaining increment. `/merge` and the tool cover
+the operation, but neither shows a checkbox list. A card needs a browser half in
+the client module system's lazy-CJS factory format — writable by hand
+(`dsh-plugin-console` ships one) but the largest of the available changes, so it
+is deferred rather than skipped for a reason.
 
 ---
 

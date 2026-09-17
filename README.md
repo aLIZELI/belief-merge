@@ -5,7 +5,7 @@
 A [DeepSeek Harness](https://github.com/deepseek-ai/deepseek-harness) plugin, a confluence theorem with a counterexample, and a benchmark that was wrong twice before it was useful.
 
 ```sh
-npm test             # 213 tests, no dependencies, no network, no API key
+npm test             # 242 tests, no dependencies, no network, no API key
 npm run demo         # end-to-end, offline
 npm run bench:tight  # the budgeted comparison
 ```

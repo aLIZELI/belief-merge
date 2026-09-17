@@ -52,21 +52,47 @@ async function* streamTruncated(partial) {
   yield { type: 'finish', reason: { kind: 'max-tokens' } };
 }
 
-function makeCtx({ surfaces = {}, stream = () => streamText('{}'), throwOn = [] } = {}) {
+function makeCtx({ surfaces = {}, stream = () => streamText('{}'), throwOn = [], sessions = [] } = {}) {
   const handlers = new Map();
   const warnings = [];
   const streamCalls = [];
+  const tools = new Map();
+  const commands = new Map();
 
   const ctx = {
     on(event, handler, options) {
       handlers.set(event, { handler, options });
     },
+    // cordis runs registered effects and disposes them with the fiber.
+    effect(fn) {
+      return fn();
+    },
     logger: { warn: (m) => warnings.push(m) },
+    tools: {
+      register(tool) {
+        tools.set(tool.name, tool);
+        return () => tools.delete(tool.name);
+      },
+    },
+    commands: {
+      register(command) {
+        commands.set(command.name, command);
+        return () => commands.delete(command.name);
+      },
+    },
     sessionQuery: {
       async readSurface(id) {
         if (throwOn.includes(id)) throw new Error(`unreadable session: ${id}`);
         if (!(id in surfaces)) throw new Error(`no such session: ${id}`);
         return surfaces[id];
+      },
+      async listSessions() {
+        return sessions.map((s) => ({ header: { id: s.id, cwd: s.workspace }, live: !!s.live }));
+      },
+      async readTitleSnapshots(ids) {
+        return sessions
+          .filter((s) => ids.includes(s.id))
+          .map((s) => ({ session: { id: s.id }, ...(s.title ? { title: s.title } : {}) }));
       },
     },
     llm: {
@@ -77,7 +103,7 @@ function makeCtx({ surfaces = {}, stream = () => streamText('{}'), throwOn = [] 
     },
   };
 
-  return { ctx, handlers, warnings, streamCalls };
+  return { ctx, handlers, warnings, streamCalls, tools, commands };
 }
 
 const AGENT = {
@@ -125,17 +151,19 @@ async function runPreStep(handler, { step = 1, signal, existing = [] } = {}) {
 test('exports the Cordis plugin shape', () => {
   assert.equal(typeof apply, 'function');
   assert.equal(pluginName, 'belief-merge');
-  assert.deepEqual(inject, ['agents', 'sessionQuery', 'llm']);
+  assert.deepEqual(inject, ['agents', 'sessionQuery', 'llm', 'tools', 'commands']);
   assert.ok(Config, 'Config schema must be exported');
   assert.equal(typeof Config, 'function');
 });
 
-test('no sources -> stays mounted but registers nothing', () => {
-  const { ctx, handlers } = makeCtx();
+test('no sources -> mounts the controls and injects nothing', () => {
+  // Returning early here was the original bug: a user with no sources
+  // configured is exactly the user who needs the tool to turn merging on.
+  const { ctx, handlers, tools, commands } = makeCtx();
   apply(ctx, { sources: [] });
-  assert.equal(handlers.size, 0);
-  apply(ctx, {});
-  assert.equal(handlers.size, 0);
+  assert.equal(tools.size, 1, 'the tool must be offered even with nothing configured');
+  assert.equal(commands.size, 1, 'the command must be offered too');
+  assert.equal(handlers.size, 1, 'the pre-step listener is registered and decides per turn');
 });
 
 test('registers a prepended agent/pre-step listener', () => {

@@ -30,7 +30,11 @@
 import z from '@deepseek-ai/schemastery';
 import { BlockAssembler, createUserMessage } from '@deepseek-ai/dsh-llm';
 
+import { dshHomePath } from '@deepseek-ai/dsh-home-paths';
+
 import { mergeSurfacesAligned, checkTrustInvariants, trustFromName } from './core/index.js';
+import { createSourceState } from './core/state.js';
+import { registerControls } from './tools.js';
 
 export const name = 'belief-merge';
 
@@ -41,7 +45,7 @@ export const name = 'belief-merge';
  * inject` on any undeclared access, and that failure is otherwise swallowed by
  * the alignment fallback (found by running against a live profile).
  */
-export const inject = ['agents', 'sessionQuery', 'llm'];
+export const inject = ['agents', 'sessionQuery', 'llm', 'tools', 'commands'];
 
 export const Config = z.object({
   /** Session ids whose content should be merged into this session. */
@@ -107,6 +111,11 @@ export const Config = z.object({
   sourceTrust: z
     .union([z.const('untrusted'), z.const('external'), z.const('trusted')])
     .default('external'),
+  /**
+   * Where the runtime source selection is persisted. Defaults to
+   * `<dsh home>/storages/belief-merge/sources.json`.
+   */
+  stateFile: z.string().default(''),
   /** Write diagnostics to stderr (`ctx.logger` is not visible on every surface). */
   debug: z.boolean().default(false),
   /** Packing algorithm: `partial` (seed enumeration) or `density` (greedy only). */
@@ -296,16 +305,12 @@ export function apply(ctx, config) {
     adjudicationTokens: 2000,
     temperature: 0,
     sourceTrust: 'external',
+    stateFile: '',
     debug: false,
     packAlgorithm: 'partial',
     packForQuery: true,
     ...config,
   };
-
-  if (!Array.isArray(cfg.sources) || cfg.sources.length === 0) {
-    // Nothing to merge -- stay mounted but inert rather than failing boot.
-    return;
-  }
 
   const warn = (message) => ctx.logger?.warn?.(message);
   // ctx.logger does not reach stderr on every surface (headless proved this),
@@ -313,6 +318,64 @@ export function apply(ctx, config) {
   const debug = cfg.debug
     ? (message) => process.stderr.write(`belief-merge[debug]: ${message}\n`)
     : () => {};
+
+  // Which sessions to merge. The config value is the deployment default; the
+  // runtime layer (set by the tool or /merge) wins over it and is what makes
+  // this usable without editing YAML or restarting.
+  const state = createSourceState({
+    file: cfg.stateFile || dshHomePath('storages', 'belief-merge', 'sources.json'),
+    defaults: Array.isArray(cfg.sources) ? cfg.sources : [],
+    onWarn: warn,
+  });
+
+  /**
+   * Gather sessions the user could merge. `listSessions()` already returns
+   * newest-first and its header carries no modification time, so that order is
+   * passed through rather than re-derived.
+   */
+  async function listCandidates() {
+    const query = ctx.sessionQuery;
+    if (!query || typeof query.listSessions !== 'function') return [];
+    const sessions = (await query.listSessions()) ?? [];
+    const ids = sessions.map((s) => s?.header?.id).filter((id) => typeof id === 'string');
+
+    const titles = new Map();
+    if (typeof query.readTitleSnapshots === 'function' && ids.length > 0) {
+      try {
+        // Shape per id: { sessionId, status: 'fulfilled'|'rejected', value: {
+        //   session: header, title?: { title, messageSeqs, source, ... } } }.
+        // Two levels of nesting were the trap: reading `snap.title` gave an
+        // object, and every session rendered as "(untitled)".
+        for (const snap of (await query.readTitleSnapshots(ids)) ?? []) {
+          if (snap?.status !== 'fulfilled') continue;
+          const value = snap.value;
+          const id = value?.session?.id;
+          const raw = value?.title;
+          const text = typeof raw === 'string' ? raw : raw?.title;
+          if (typeof id === 'string' && typeof text === 'string' && text.length > 0) {
+            titles.set(id, text);
+          }
+        }
+      } catch (error) {
+        debug(`title lookup failed: ${error?.message ?? error}`);
+      }
+    }
+
+    return sessions
+      .map((s) => ({
+        id: s?.header?.id,
+        title: titles.get(s?.header?.id),
+        workspace: s?.header?.cwd,
+        live: s?.live === true,
+      }))
+      .filter((c) => typeof c.id === 'string');
+  }
+
+  // Registered unconditionally: a user with no sources configured is exactly
+  // the user who needs the tool to turn merging on. Returning early here was
+  // why the plugin could only be enabled by editing YAML.
+  registerControls(ctx, { state, listCandidates, onWarn: warn });
+  debug(`source state: ${state.file} (in effect: ${state.source()}, ${state.get().length} source(s))`);
 
   ctx.on(
     'agent/pre-step',
@@ -322,9 +385,15 @@ export function apply(ctx, config) {
       if (payload?.signal?.aborted) return decision;
       if (cfg.oncePerTurn && payload?.step !== 1) return decision;
 
+      // Read the state per turn, so a tool call or /merge takes effect on the
+      // next turn instead of at the next restart.
+      const self = payload?.agent?.session?.id;
+      const sources = state.get().filter((id) => id !== self);
+      if (sources.length === 0) return decision;
+
       const surfaces = [];
       const sourceTrust = trustFromName(cfg.sourceTrust);
-      for (const id of cfg.sources) {
+      for (const id of sources) {
         try {
           const surface = await ctx.sessionQuery.readSurface(id);
           const messages = toMessages(surface);
