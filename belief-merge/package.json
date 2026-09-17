@@ -1,6 +1,6 @@
 {
   "name": "dsh-belief-merge",
-  "version": "0.3.0",
+  "version": "0.3.1",
   "description": "Provenance-retaining cross-session context merge for DeepSeek Harness",
   "type": "module",
   "main": "lib/index.js",

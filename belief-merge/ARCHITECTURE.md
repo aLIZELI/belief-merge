@@ -2,8 +2,10 @@
 
 > **What this is.** Design *rationale* is in [TECHNICAL-REPORT.md](TECHNICAL-REPORT.md);
 > usage is in [README.md](README.md). This file is the map of the code as it
-> actually exists in `0.3.0` — what runs, in what order, and where the guarantees
-> come from. Every symbol named here was checked against the source, not recalled.
+> actually exists — what runs, in what order, and where the guarantees come from.
+> Every symbol named here was checked against the source, not recalled.
+> (The code last changed in `0.3.0`; `0.3.1` is documentation only, so this map
+> describes the current release too.)
 
 ---
 

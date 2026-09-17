@@ -4,25 +4,64 @@ Notable changes to `dsh-belief-merge`, newest first. Format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); versions follow
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-> ### Upgrading from any 0.x to 0.3.0 needs an explicit version
+> ### Upgrading from `0.2.0` or older needs an explicit version
 >
 > While the major version is `0`, a caret range does **not** cross a minor
-> version. A profile pinned at `^0.2.0` will never resolve to `0.3.0` on its own,
-> and neither would `^0.0.1` have reached `0.1.0`. Name the version:
+> version: `^0.2.0` will never resolve to `0.3.x`, and neither would `^0.0.1`
+> have reached `0.1.0`. Name the version:
 >
 > ```sh
-> dsh plugin --profile web add dsh-belief-merge@0.3.0
+> dsh plugin --profile web add dsh-belief-merge@0.3.1
 > ```
+>
+> **Patches are the exception.** `^0.3.0` *does* resolve `0.3.1`, because the
+> minor version is unchanged. So this is a one-time step: get onto `0.3.x`
+> explicitly, and later patch releases follow on their own.
 >
 > `0.3.0` is the first release with the tool and the command, so a profile still
 > on `^0.2.0` has the merge but no way to configure it from a conversation.
 > `0.0.1` additionally predates the `dsh.bundle` manifest and was installed as a
 > plain dependency rather than a profile layer.
 >
-> After installing `0.3.0`, restart once. That activates `patchReload: live` in
-> the profile, after which source changes no longer need a restart.
+> After installing `0.3.0` or later, restart once. That activates
+> `patchReload: live` in the profile, after which source changes no longer need a
+> restart.
 
 ---
+
+## [0.3.1] — 2026-09-17
+
+Documentation only — **no code changed**, so upgrading from `0.3.0` changes no
+behaviour.
+
+### Added
+
+- **[ARCHITECTURE.md](ARCHITECTURE.md)** — the map of the code as built: the
+  pipeline stage by stage with its real entry points, the two merge
+  representations and which one production uses, the three places a model is
+  allowed to act, the degradation ladder, and what is deliberately absent.
+- **[CHANGELOG.md](CHANGELOG.md)** — this file.
+- **CI** (`.github/workflows/test.yml`) — the suite, the demo and the tight
+  benchmark on Node 20 and 22, plus a job that re-runs the 72,760-profile
+  confluence enumeration so the headline number is checked rather than trusted.
+
+### Fixed
+
+- `lib/index.js` still declared in its header that the adapter had "NOT been
+  exercised inside a live DSH process", long after it had been.
+- The README described the injected block as *prepended to the context*. It is
+  **appended**: `dsh-session-reference` documents the order as "direct messages
+  followed by their session-reference context", and `{ prepend: true }` on
+  `ctx.on` is *listener* order, not message position.
+- The README's dev-dependency count said two; there are four.
+
+### Changed
+
+- The hand-maintained "tests-242 passing" badge is replaced by the real CI
+  badge.
+- The original design proposal now carries a banner explaining that its
+  M0–M8 numbering is not the plugin's, and that two of its milestones
+  (Shapley attribution, a learned merge policy) were never built.
 
 ## [0.3.0] — 2026-09-17
 

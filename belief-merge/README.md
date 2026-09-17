@@ -203,17 +203,24 @@ Two separate traps, both of which need an explicit version:
 plain dependency rather than a profile layer.
 
 **From `0.1.0` or `0.2.0`** — caret ranges do not cross a minor version while
-the major is `0`, so a profile pinned at `^0.2.0` will never pick up `0.3.0` on
+the major is `0`, so a profile pinned at `^0.2.0` will never pick up `0.3.x` on
 its own:
 
 ```sh
-dsh plugin --profile web add dsh-belief-merge@0.3.0
+dsh plugin --profile web add dsh-belief-merge@0.3.1
 ```
+
+Patches are the exception: `^0.3.0` *does* resolve `0.3.1`, since the minor
+version is unchanged. So this is a one-time step — get onto `0.3.x` explicitly
+and later patch releases follow on their own.
 
 `0.3.0` is the first release with `merge_sessions` and `/merge`, so a profile
 still on `^0.2.0` has the merge but no way to configure it in conversation.
 After adding it, restart once: that activates `patchReload: live`, after which
 source changes no longer need a restart.
+
+Full release history, including what changed in each version:
+[CHANGELOG.md](CHANGELOG.md).
 
 ---
 
