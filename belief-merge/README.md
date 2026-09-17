@@ -493,6 +493,38 @@ lives on the deterministic side, so it cannot be talked out of by a model.
 
 ---
 
+## Known UX gap: configuring it is unpleasant
+
+Recorded because it is the weakest part of the plugin, and because the honest
+version of the problem is more useful than a vague "TODO".
+
+**What it is like today.** A user must hand-edit
+`~/.dsh/profiles/<profile>/cordis.patch.yml` and restart the harness to change
+which sessions are merged.
+
+**Only half of that is necessary.**
+
+| step | necessary? | why |
+|---|---|---|
+| naming the sessions | **yes** | no default can know which conversations a user wants merged, and guessing would be worse than asking |
+| hand-editing YAML | **no** | the harness has a settings surface; a client half could collect the ids |
+| restarting | **no** | the profile defaults to `patchReload: startup`; `live` watches the patch files and applies changes without a restart |
+
+**Options, cheapest first:**
+
+| fix | removes | cost |
+|---|---|---|
+| set `patchReload: live` on the profile | the restart | one line, but it changes reload behaviour for **every** plugin in that profile |
+| a `dsh.client` settings panel | the YAML editing | a browser half and UI work; the largest change here |
+| a model-facing tool (`merge_sessions(ids)`) | both | the model, not the user, decides the ids — good for a one-off, poor as a standing configuration |
+| a prompt mention (`@merge <id>`) | both | parsing plus a discovery UI; closest to what `dsh-session-reference` already does |
+
+**The honest summary:** the *information* the user must supply is irreducible,
+but the *friction* around supplying it is not, and today's version charges the
+maximum. This is a UX debt, not a design constraint.
+
+---
+
 ## Layout
 
 ```
