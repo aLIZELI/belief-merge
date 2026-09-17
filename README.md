@@ -108,18 +108,27 @@ block, the model reported:
 
 ## What is actually here
 
-| | |
-|---|---|
-| **[TECHNICAL-REPORT.md](belief-merge/TECHNICAL-REPORT.md)** | the full writeup — design, the confluence result, the benchmark, limitations |
-| **[belief-merge/](belief-merge/)** | the plugin: 14 core modules, 242 tests, an offline demo |
-| **[belief-merge/VERIFY.md](belief-merge/VERIFY.md)** | the live-run record — **13 bugs found by running it**, and a failure taxonomy |
-| **[belief-merge/bench/](belief-merge/bench/)** | MergeBench — generator, scored arms, results |
-| **[beliefmerge-t1/](beliefmerge-t1/)** | the confluence experiment — exhaustive enumeration, minimal counterexamples |
-| **[docs/](docs/)** | everything that is not code: |
-| ↳ [会话融合引擎-BeliefMerge-可行性与算法架构.md](docs/会话融合引擎-BeliefMerge-可行性与算法架构.md) | the original design document (Chinese): 8 stages, 6 novelty points, 8 invariants |
-| ↳ [conversation-branch-merge-litreview.md](docs/conversation-branch-merge-litreview.md) | the literature review, ~60 references checked against Crossref/OpenAlex/arXiv |
-| ↳ [BeliefMerge-算法逻辑图.html](docs/BeliefMerge-算法逻辑图.html) | the architecture diagram, openable in a browser |
-| ↳ [refcheck/](docs/refcheck/) | the scripts used to verify those references |
+Four kinds of document. The third column says who each one is for.
+
+| | | read it if |
+|---|---|---|
+| **[belief-merge/README.md](belief-merge/README.md)** | **the user manual** — install, usage, configuration reference, upgrade traps, what is verified and what is not | you want to **use** the plugin |
+| **[ARCHITECTURE.md](belief-merge/ARCHITECTURE.md)** | **the code map, as built** — the pipeline stage by stage, the three places a model may act, the degradation ladder | you want to **understand or extend** it |
+| **[TECHNICAL-REPORT.md](belief-merge/TECHNICAL-REPORT.md)** | the full writeup — design rationale, the confluence result, the benchmark, limitations | you want the **reasoning** behind the design |
+| **[belief-merge/CHANGELOG.md](belief-merge/CHANGELOG.md)** | release history, and why upgrading needs an explicit version | you are **upgrading** |
+| **[belief-merge/VERIFY.md](belief-merge/VERIFY.md)** | the live-run record — **13 bugs found by running it**, and a failure taxonomy | you want to know **what actually happened** in a real harness |
+| **[beliefmerge-t1/](beliefmerge-t1/)** | the confluence experiment — exhaustive enumeration over 72,760 profiles, minimal counterexamples | you want to **check the headline claim** |
+| **[belief-merge/bench/](belief-merge/bench/)** | MergeBench — generator, scored arms, results, and what it does not measure | you want to **check the numbers** |
+| **[belief-merge/](belief-merge/)** | the plugin itself: 14 core modules, 242 tests, an offline demo | you want to **read the code** |
+| **[docs/](docs/)** | research material, not shipped in the npm package | |
+| ↳ [会话融合引擎-BeliefMerge-可行性与算法架构.md](docs/会话融合引擎-BeliefMerge-可行性与算法架构.md) | the original **pre-implementation proposal** (Chinese) — 8 stages, 6 novelty points, 8 invariants. Read the banner first: its M-numbering is not the plugin's, and two of its milestones were never built | you want to see **how it was planned** |
+| ↳ [conversation-branch-merge-litreview.md](docs/conversation-branch-merge-litreview.md) | the literature review, ~60 references checked against Crossref/OpenAlex/arXiv | you are asking **"has this been done before?"** |
+| ↳ [BeliefMerge-算法逻辑图.html](docs/BeliefMerge-算法逻辑图.html) | the algorithm diagram, openable in a browser and exportable to PNG | you want **one picture** |
+| ↳ [refcheck/](docs/refcheck/) | the scripts and table used to verify those references | you are **auditing the citations** |
+
+> The npm package ships `lib/`, `bench/`, `cordis.patch.yml`, `ARCHITECTURE.md`,
+> `CHANGELOG.md`, `TECHNICAL-REPORT.md` and `VERIFY.md` — see the `files` field in
+> `package.json`. `docs/` and `beliefmerge-t1/` are repository material only.
 
 ---
 

@@ -1,0 +1,64 @@
+name: test
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  # The plugin. Node 20 is the package's declared floor (`engines`), 22 is what
+  # it is developed against.
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        node: ['20', '22']
+    defaults:
+      run:
+        working-directory: belief-merge
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node }}
+          cache: npm
+          cache-dependency-path: belief-merge/package-lock.json
+
+      # The core tests need nothing, but test/plugin.smoke.test.js loads the
+      # real @deepseek-ai/dsh-llm packages, so the dev dependencies are required
+      # for the suite to reach 242/242.
+      - name: Install
+        run: npm ci --no-audit --no-fund
+
+      - name: Tests
+        run: npm test
+
+      # The demo and the benchmark are the evidence behind the README's claims,
+      # so they run on every push rather than only when someone remembers.
+      - name: Demo (offline, seven worked examples)
+        run: npm run demo
+
+      - name: MergeBench at a realistic budget
+        run: npm run bench:tight
+
+  # The headline negative result — "summarize as you merge" is unsound — is a
+  # brute-force claim over 72,760 enumerated profiles. Re-running it here means
+  # the number in the README is checked rather than trusted. Pure stdlib, ~14s.
+  theorem:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Enumeration (T1)
+        working-directory: beliefmerge-t1
+        run: python3 run_t1.py

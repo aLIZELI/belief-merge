@@ -2,7 +2,7 @@
 
 [![npm](https://img.shields.io/npm/v/dsh-belief-merge)](https://www.npmjs.com/package/dsh-belief-merge)
 [![license](https://img.shields.io/npm/l/dsh-belief-merge)](LICENSE)
-![tests](https://img.shields.io/badge/tests-242%20passing-brightgreen)
+[![test](https://github.com/aLIZELI/belief-merge/actions/workflows/test.yml/badge.svg)](https://github.com/aLIZELI/belief-merge/actions/workflows/test.yml)
 
 Cross-session context merge for **DeepSeek Harness**. Reads N other sessions'
 model surfaces, merges them, and injects the result as durable context on the
@@ -81,7 +81,11 @@ of it.
 
 #### What you will see
 
-At the first step of every turn, a block is prepended to the context:
+At the first step of every turn, a block is **appended to the messages entering
+that step** — the same shape the official `dsh-time-context` uses, and the order
+`dsh-session-reference` documents ("direct messages followed by their
+session-reference context"). The listener is registered *prepended* so it runs
+before other pre-step listeners; that is listener order, not message order.
 
 ```markdown
 ## Merged context (BeliefMerge)
@@ -115,12 +119,18 @@ lists every session in the current workspace with id, age, size and title.
 
 ```sh
 cd belief-merge
-npm install          # two dev dependencies, from npm
+npm install          # four dev dependencies, from npm
 npm test             # 242 tests, no network, no API key
 npm run demo         # seven worked examples, offline
 npm run bench        # MergeBench
 npm run bench:tight  # the budgeted comparison
 ```
+
+Then read **[ARCHITECTURE.md](ARCHITECTURE.md)** — the pipeline stage by stage,
+the two merge representations and which one production uses, the three places a
+model is allowed to act, and the degradation ladder. It is the map; the
+[TECHNICAL-REPORT.md](TECHNICAL-REPORT.md) is the argument, and
+[CHANGELOG.md](CHANGELOG.md) is what changed when.
 
 Node 20+. The core (`lib/core/`) has **zero DSH imports** — the harness is an
 adapter, not a foundation — so the merge engine can be exercised and tested

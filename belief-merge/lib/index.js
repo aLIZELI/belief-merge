@@ -22,9 +22,12 @@
  *    excludes reasoning and tool content and does no merging.  This plugin
  *    includes reasoning blocks by default and merges rather than concatenates.
  *
- * ⚠️ STATUS: the core in ./core is fully tested (`npm test`).  This adapter is
- * written against the documented contracts above but has NOT been exercised
- * inside a live DSH process -- see README "Verified vs unverified".
+ * ⚠️ STATUS: both layers are verified against reality. The core in ./core is
+ * covered by `npm test`, and this adapter has been exercised inside a live DSH
+ * process against real sessions and a real model (see VERIFY.md, and
+ * test/plugin.smoke.test.js which drives the real packages). What remains
+ * unverified is narrow and listed under README "Status: what is verified and
+ * what is not".
  */
 
 import z from '@deepseek-ai/schemastery';
