@@ -1,6 +1,6 @@
 {
   "name": "dsh-belief-merge",
-  "version": "0.3.1",
+  "version": "0.3.2",
   "description": "Provenance-retaining cross-session context merge for DeepSeek Harness",
   "type": "module",
   "main": "lib/index.js",
@@ -42,11 +42,11 @@
   "license": "MIT",
   "peerDependencies": {
     "@deepseek-ai/cordis": "^4.0.2",
-    "@deepseek-ai/dsh-agent": "^0.1.5-rc.2",
-    "@deepseek-ai/dsh-commands": "^0.1.5-rc.2",
-    "@deepseek-ai/dsh-home-paths": "^0.1.5-rc.2",
-    "@deepseek-ai/dsh-llm": "^0.1.5-rc.2",
-    "@deepseek-ai/dsh-tools": "^0.1.5-rc.2",
+    "@deepseek-ai/dsh-agent": ">=0.1.5-rc.2 <0.2.0-0 || >=0.2.0-rc.1 <0.3.0-0",
+    "@deepseek-ai/dsh-commands": ">=0.1.5-rc.2 <0.2.0-0 || >=0.2.0-rc.1 <0.3.0-0",
+    "@deepseek-ai/dsh-home-paths": ">=0.1.5-rc.2 <0.2.0-0 || >=0.2.0-rc.1 <0.3.0-0",
+    "@deepseek-ai/dsh-llm": ">=0.1.5-rc.2 <0.2.0-0 || >=0.2.0-rc.1 <0.3.0-0",
+    "@deepseek-ai/dsh-tools": ">=0.1.5-rc.2 <0.2.0-0 || >=0.2.0-rc.1 <0.3.0-0",
     "@deepseek-ai/schemastery": "^3.18.2"
   },
   "author": "aLIZELI",
@@ -68,9 +68,9 @@
     }
   },
   "devDependencies": {
-    "@deepseek-ai/dsh-home-paths": "0.1.5-rc.2",
-    "@deepseek-ai/dsh-llm": "0.1.5-rc.2",
-    "@deepseek-ai/dsh-tools": "0.1.5-rc.2",
-    "@deepseek-ai/schemastery": "3.18.2"
+    "@deepseek-ai/dsh-home-paths": "0.2.0-rc.2",
+    "@deepseek-ai/dsh-llm": "0.2.0-rc.2",
+    "@deepseek-ai/dsh-tools": "0.2.0-rc.2",
+    "@deepseek-ai/schemastery": "3.18.4"
   }
 }

@@ -11,10 +11,10 @@ Notable changes to `dsh-belief-merge`, newest first. Format follows
 > have reached `0.1.0`. Name the version:
 >
 > ```sh
-> dsh plugin --profile web add dsh-belief-merge@0.3.1
+> dsh plugin --profile web add dsh-belief-merge@0.3.2
 > ```
 >
-> **Patches are the exception.** `^0.3.0` *does* resolve `0.3.1`, because the
+> **Patches are the exception.** `^0.3.0` *does* resolve `0.3.2`, because the
 > minor version is unchanged. So this is a one-time step: get onto `0.3.x`
 > explicitly, and later patch releases follow on their own.
 >
@@ -28,6 +28,44 @@ Notable changes to `dsh-belief-merge`, newest first. Format follows
 > restart.
 
 ---
+
+## [0.3.2] — 2026-09-30
+
+Support for DeepSeek Harness **0.2**, including the desktop app.
+
+This is a **compatibility release**: no behaviour changed, and the code is
+identical apart from the dependency declarations.
+
+### Fixed
+
+- **The peer ranges excluded every 0.2.x build.** They were `^0.1.5-rc.2`, which
+  resolves to `>=0.1.5-rc.2 <0.2.0-0` — so a profile on the current harness
+  (internal packages at `0.2.0-rc.2`) hit `ERESOLVE`, and the harness's plugin
+  manager reported the plugin as incompatible. The ranges are now explicit
+  two-branch ranges:
+
+  ```
+  >=0.1.5-rc.2 <0.2.0-0 || >=0.2.0-rc.1 <0.3.0-0
+  ```
+
+  A single range would not have worked. `>=0.1.5-rc.2 <0.3.0-0` *looks* broad but
+  silently excludes `0.2.0-rc.2`: node-semver only admits a prerelease when some
+  comparator shares its exact `major.minor.patch` tuple **and** carries a
+  prerelease tag, and `<0.3.0-0` is on the `0.3.0` tuple. The second branch puts
+  a prerelease comparator on the `0.2.0` tuple, which is what lets the current
+  release through.
+
+### Changed
+
+- Dev dependencies moved to `0.2.0-rc.2` (and `schemastery` to `3.18.4`), so the
+  suite is what CI runs and CI now tests against the current harness.
+
+### Verified
+
+- The full suite passes against Harness 0.2: **242/242**, plus the demo and the
+  benchmark. The APIs this plugin uses — `BlockAssembler`, `createUserMessage`,
+  `dshHomePath`, `defineTool`, and the `sessionQuery` / `tools` / `commands`
+  services — are unchanged in 0.2.
 
 ## [0.3.1] — 2026-09-17
 

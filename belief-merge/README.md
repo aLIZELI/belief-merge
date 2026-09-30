@@ -207,10 +207,10 @@ the major is `0`, so a profile pinned at `^0.2.0` will never pick up `0.3.x` on
 its own:
 
 ```sh
-dsh plugin --profile web add dsh-belief-merge@0.3.1
+dsh plugin --profile web add dsh-belief-merge@0.3.2
 ```
 
-Patches are the exception: `^0.3.0` *does* resolve `0.3.1`, since the minor
+Patches are the exception: `^0.3.0` *does* resolve `0.3.2`, since the minor
 version is unchanged. So this is a one-time step — get onto `0.3.x` explicitly
 and later patch releases follow on their own.
 
@@ -218,6 +218,11 @@ and later patch releases follow on their own.
 still on `^0.2.0` has the merge but no way to configure it in conversation.
 After adding it, restart once: that activates `patchReload: live`, after which
 source changes no longer need a restart.
+
+**On Harness 0.2.** `0.3.2` is the first release whose peer ranges admit the
+0.2.x line. Earlier versions were pinned to `^0.1.5-rc.2`, which excludes every
+0.2.x build — on Harness 0.2 the plugin manager reports them as incompatible.
+If you are on Harness 0.2, install `0.3.2` or later.
 
 Full release history, including what changed in each version:
 [CHANGELOG.md](CHANGELOG.md).
